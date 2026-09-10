@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 09 Sep 2026
 # COMPLETED: 
-# LAST MODIFIED: 09 Sep 2026
+# LAST MODIFIED: 10 Sep 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -332,7 +332,9 @@ bar.off.pfoo <- ggplot(data = metrics.off) +
   
   geom_col(aes(x = pfoo,
                y = reorder(final.taxon, pfoo),
-               fill = pfoo)) +
+               fill = pfoo),
+           color = "darkgray",
+           linewidth = 0.2) +
   
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
@@ -348,13 +350,14 @@ bar.off.pfoo <- ggplot(data = metrics.off) +
   scale_fill_viridis_c(option = "inferno") +
   
   # reverse the x axis
-  scale_x_reverse() +
+  scale_x_reverse(breaks = c(0.2, 0.4, 0.6, 0.8),
+                  labels = c(20, 40, 60, 80)) +
   
   # move axis labels to other side
   scale_y_discrete(position = "right") +
   
   # axis limits
-  coord_cartesian(xlim = c(0.047, 1))
+  coord_cartesian(xlim = c(0.047, max(metrics.off$pfoo)))
 
 # wPOO
 bar.off.wpoo <- ggplot(data = metrics.off) +
@@ -363,7 +366,9 @@ bar.off.wpoo <- ggplot(data = metrics.off) +
   
   geom_col(aes(x = wpoo,
                y = reorder(final.taxon, pfoo),
-               fill = wpoo)) +
+               fill = wpoo),
+           color = "darkgray",
+           linewidth = 0.2) +
   
   theme(panel.grid = element_blank(),
         axis.text.y = element_text(color = "black",  # must use text in this one
@@ -383,12 +388,14 @@ bar.off.wpoo <- ggplot(data = metrics.off) +
   scale_fill_viridis_c(option = "inferno") +
   
   # axis limits
-  coord_cartesian(xlim = c(0.0038, max(metrics.off$wpoo)))
+  coord_cartesian(xlim = c(0.006, max(metrics.off$wpoo))) +
+  scale_x_continuous(breaks = c(0.02, 0.04, 0.06, 0.08, 0.1, 0.12),
+                     labels = c(2, 4, 6, 8, 10, 12))
 
 # plot together
 plot_grid(bar.off.pfoo, bar.off.wpoo,
           nrow = 1,
-          rel_widths = c(1, 1.55))
+          rel_widths = c(1, 1.4))
 
 # 650 x 550
 
@@ -399,7 +406,9 @@ bar.on.pfoo <- ggplot(data = metrics.on) +
   
   geom_col(aes(x = pfoo,
                y = reorder(final.taxon, pfoo),
-               fill = pfoo)) +
+               fill = pfoo),
+           color = "darkgray",
+           linewidth = 0.2) +
   
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
@@ -415,13 +424,14 @@ bar.on.pfoo <- ggplot(data = metrics.on) +
   scale_fill_viridis_c(option = "mako") +
   
   # reverse the x axis
-  scale_x_reverse() +
+  scale_x_reverse(breaks = c(0.2, 0.4, 0.6, 0.8),
+                  labels = c(20, 40, 60, 80)) +
   
   # move axis labels to other side
   scale_y_discrete(position = "right") +
   
   # axis limits
-  coord_cartesian(xlim = c(0.047, 1))
+  coord_cartesian(xlim = c(0.047, max(metrics.on$pfoo)))
 
 # wPOO
 bar.on.wpoo <- ggplot(data = metrics.on) +
@@ -430,7 +440,9 @@ bar.on.wpoo <- ggplot(data = metrics.on) +
   
   geom_col(aes(x = wpoo,
                y = reorder(final.taxon, pfoo),
-               fill = wpoo)) +
+               fill = wpoo),
+           color = "darkgray",
+           linewidth = 0.2) +
   
   theme(panel.grid = element_blank(),
         axis.text.y = element_text(color = "black",  # must use text in this one
@@ -450,11 +462,13 @@ bar.on.wpoo <- ggplot(data = metrics.on) +
   scale_fill_viridis_c(option = "mako") +
   
   # axis limits
-  coord_cartesian(xlim = c(0.04, max(metrics.on$wpoo)))
+  coord_cartesian(xlim = c(0.046, max(metrics.on$wpoo))) +
+  scale_x_continuous(breaks = c(0.2, 0.4, 0.6, 0.8, 1.0),
+                     labels = c(20, 40, 60, 80, 100))
 
 # plot together
 plot_grid(bar.on.pfoo, bar.on.wpoo,
           nrow = 1,
-          rel_widths = c(1, 1.55))
+          rel_widths = c(1, 1.4))
 
 # 650 x 367
