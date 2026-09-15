@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 09 Sep 2026
 # COMPLETED: 09 Sep 2026
-# LAST MODIFIED: 09 Sep 2026
+# LAST MODIFIED: 15 Sep 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -35,13 +35,15 @@ reads.taxa <- reads.all |>
                     family,
                     genus,
                     species,
-                    final.taxon),
+                    final.taxon,
+                    cat1,
+                    cat2),
     
     by = "ASV.unq"
     
   ) |>
   
-  # remove NAs (bait, contaminants, unidentified ASVs)
+  # remove NAs (bait and contaminants)
   drop_na(final.taxon)
 
 # ______________________________________________________________________________
