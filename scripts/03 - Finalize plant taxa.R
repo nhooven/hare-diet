@@ -301,13 +301,23 @@ asvs.all.1 <- asvs.all |>
 # add more as needed
 
 # ______________________________________________________________________________
+# 6. Do we have duplicates? ----
+# ______________________________________________________________________________
+
+sum(duplicated(asvs.all.1$ASV.unq))  # 18 duplicates
+
+asvs.all.2 <- asvs.all.1[!duplicated(asvs.all.1$ASV.unq), ]
+
+sum(duplicated(asvs.all.2$ASV.unq))  # 0 duplicates
+
+# ______________________________________________________________________________
 # 6. How many unique taxa? ----
 # ______________________________________________________________________________
 
-length(unique(asvs.all.1$final.taxon))
+length(unique(asvs.all.2$final.taxon))
 
 # by functional group
-asvs.all.1 |> group_by(final.taxon) |> 
+asvs.all.2 |> group_by(final.taxon) |> 
   
   slice(1) |>
   ungroup() |>
@@ -318,4 +328,4 @@ asvs.all.1 |> group_by(final.taxon) |>
 # 7. Write to file ----
 # ______________________________________________________________________________
 
-write.csv(asvs.all.1, "data_cleaned/all_taxa.csv", row.names = F)
+write.csv(asvs.all.2, "data_cleaned/all_taxa.csv", row.names = F)
