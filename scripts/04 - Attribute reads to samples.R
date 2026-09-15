@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 09 Sep 2026
 # COMPLETED: 09 Sep 2026
-# LAST MODIFIED: 09 Sep 2026
+# LAST MODIFIED: 15 Sep 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -212,7 +212,47 @@ reads.all <- bind_rows(
 )
 
 # ______________________________________________________________________________
-# 5. Save to file ----
+# 5. Reads per sample ----
+
+# Sacks Lab recommends two cutoffs:
+# "reasonable" - 2 SDs higher than the average n contaminant
+cutoff.reasonable <- 792
+
+# "stringent" - double the highest number of contaminant reads in a control sample = 2,478
+cutoff.stringent <- 2478
+
+# ______________________________________________________________________________
+
+reads.per.sample <- reads.all |> group_by(Final.sample.ID) |>
+  
+  summarize(total.reads = sum(reads)) |>
+  
+  arrange(total.reads)
+
+nrow(reads.per.sample) # total = 182
+length(which(reads.per.sample$total.reads > cutoff.reasonable)) # reasonable = 178
+length(which(reads.per.sample$total.reads > cutoff.stringent)) # stringent = 160
+
+# assign sample IDs to include
+sample.IDs.include.reasonable <- reads.per.sample$Final.sample.ID[reads.per.sample$total.reads > cutoff.reasonable]
+sample.IDs.include.stringent <- reads.per.sample$Final.sample.ID[reads.per.sample$total.reads > cutoff.stringent]
+
+# add "include" columns
+reads.all <- reads.all |>
+  
+  mutate(
+    
+    include.reasonable = ifelse(Final.sample.ID %in% sample.IDs.include.reasonable,
+                                "Y",
+                                "N"),
+    include.stringent = ifelse(Final.sample.ID %in% sample.IDs.include.stringent,
+                               "Y",
+                               "N")
+    
+  )
+
+# ______________________________________________________________________________
+# 6. Save to file ----
 # ______________________________________________________________________________
 
 write.csv(samples.lookup, "data_cleaned/samples_lookup.csv", row.names = F)
