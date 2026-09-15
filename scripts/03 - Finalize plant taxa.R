@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 08 Sep 2026
 # COMPLETED: 08 Sep 2026
-# LAST MODIFIED: 08 Sep 2026
+# LAST MODIFIED: 14 Sep 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -92,8 +92,25 @@ asvs.all$species[227] <- "triflorum"
 asvs.all$genus[274]
 asvs.all$species[274] <- "adunca"
 
+# Asteraceae sub-groups
+# add column
+asvs.all$sub.group <- ""
+
+(unk.Aster <- which(asvs.all$family == "Asteraceae" & asvs.all$genus == ""))
+
+asvs.all$taxa[unk.Aster]
+
+# change genus
+asvs.all$genus[unk.Aster][1:4] <- c("Solidago / Symphyotrichum", "Hieracium / Taraxacum",
+                                    "Solidago / Symphyotrichum", "Hieracium / Taraxacum")
+
+# assign sub-group
+asvs.all$sub.group[unk.Aster] <- c("Asteraceae 1", "Asteraceae 2",
+                                   "Asteraceae 1", "Asteraceae 2",
+                                   "unknown Asteraceae")
+
 # ______________________________________________________________________________
-# 5. Final taxon name ----
+# 5. Final taxon name and functional groups ----
 # ______________________________________________________________________________
 
 asvs.all.1 <- asvs.all |>
@@ -102,27 +119,148 @@ asvs.all.1 <- asvs.all |>
     
     final.taxon = case_when(
       
-      # just a family
-      genus == "" & species == "" ~ family,
+      # just a family (no sub-group)
+      genus == "" & species == "" & sub.group == "" ~ family,
       
-      # just a genus
-      genus != "" & species == "" ~ genus,
+      # just a genus (no sub-group)
+      genus != "" & species == "" & sub.group == "" ~ genus,
       
       # species included
-      genus != "" & species != "" ~ paste0(genus, " ", species)
+      genus != "" & species != "" ~ paste0(genus, " ", species),
+      
+      # just a family and sub-group
+      family != "" & sub.group != "" ~ sub.group
       
     )
     
   ) |>
   
-  # drop "taxa" notes column
-  dplyr::select(-taxa)
+  # assign functional groups
+  # cat1 - broadest category
+    # conifer
+    # woody broadleaf
+    # sub-shrub
+    # forb
+    # graminoid
+    # unknown
+  mutate(
+    
+    cat1 = case_when(
+      
+      genus %in% c("Pinus",
+                   "Larix",
+                   "Picea",
+                   "Abies",
+                   "Juniperus",
+                   "Pseudotsuga") ~ "conifer",
+      genus %in% c("Shepherdia",
+                   "Alnus",
+                   "Rubus",
+                   "Ribes",
+                   "Populus",
+                   "Artemisia",
+                   "Salix",
+                   "Lonicera",
+                   "Philadelphus",
+                   "Rhododendron",
+                   "Rosa",
+                   "Celtis",
+                   "Symphoricarpos") ~ "woody broadleaf",
+      
+      genus %in% c("Vaccinium",
+                   "Paxistima",
+                   "Arctostaphylos",
+                   "Spiraea",
+                   "Linnaea") ~ "sub-shrub",
+      
+      genus %in% c("Aquilegia",
+                   "Lupinus",
+                   "Trifolium",
+                   "Chamaenerion",
+                   "Conrus",
+                   "Astragalus",
+                   "Epilobium",
+                   "Veronica",
+                   "Viola",
+                   "Thalictrum",
+                   "Antennaria",
+                   "Arnica",
+                   "Geum",
+                   "Verbena",
+                   "Salvia",
+                   "Eriogonum",
+                   "Allium",
+                   "Goodyera",
+                   "Brassica",
+                   "Rumex",
+                   "Lathyrus",
+                   "Ligusticum",
+                   "Penstemon",
+                   "Spergularia",
+                   "Polygonum",
+                   "Hedysarum",
+                   "Ranunculus",
+                   "Oenothera",
+                   "Sedum",
+                   "Amaranthus",
+                   "Orthilia",
+                   "Verbascum",
+                   "Streptopus",
+                   "Solidago / Symphyotrichum",
+                   "Achillea",
+                   "Adenocaulon",
+                   "Convolvulus",
+                   "Celtis",
+                   "Lycium",
+                   "Hieracium / Taraxacum",
+                   "Erigeron",
+                   "Anaphalis",
+                   "Athyrium",
+                   "Descurainia",
+                   "Chorispora",
+                   "Lactuca",
+                   "Capsella",
+                   "Arenaria",
+                   "Chenopodium",
+                   "Gnaphalium",
+                   "Osmorhiza",
+                   "Cerastium",
+                   "Cornus",
+                   "Galium",
+                   "Stellaria") ~ "forb",
+      
+      family %in% c("Poaceae", "Cyperaceae") ~ "graminoid",
+      
+      genus %in% c("") ~ "unknown"
+      
+    )
+    
+  ) |>
+  
+  # cat2 - adds a lodgepole level
+  mutate(
+    
+    cat2 = ifelse(species == "contorta",
+                  "lodgepole pine",
+                  cat1)
+    
+  )
+
+# add more as needed
 
 # ______________________________________________________________________________
 # 6. How many unique taxa? ----
 # ______________________________________________________________________________
 
 length(unique(asvs.all.1$final.taxon))
+
+# by functional group
+asvs.all.1 |> group_by(final.taxon) |> 
+  
+  slice(1) |>
+  ungroup() |>
+  group_by(cat1, cat2) |>
+  summarize(n())
 
 # ______________________________________________________________________________
 # 7. Write to file ----
