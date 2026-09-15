@@ -238,7 +238,8 @@ sample.IDs.include.reasonable <- reads.per.sample$Final.sample.ID[reads.per.samp
 sample.IDs.include.stringent <- reads.per.sample$Final.sample.ID[reads.per.sample$total.reads > cutoff.stringent]
 
 # add "include" columns
-reads.all <- reads.all |>
+# should this be in reads? no, probably samples
+samples.lookup <- samples.lookup |>
   
   mutate(
     
