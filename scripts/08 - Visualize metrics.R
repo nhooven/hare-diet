@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 15 Sep 2026
+# LAST MODIFIED: 16 Sep 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -31,7 +31,16 @@ taxa.info <- read.csv("data_cleaned/reads_taxa.csv") |>
   
   slice(1) |>
   
-  ungroup()
+  ungroup() |>
+  
+  # functional groups
+  mutate(func = factor(cat1,
+                       levels = c("conifer",
+                                  "woody broadleaf",
+                                  "sub-shrub",
+                                  "forb", 
+                                  "graminoid",
+                                  "unknown")))
 
 # join in
 metrics.off <- metrics.off |> left_join(taxa.info)
@@ -39,6 +48,12 @@ metrics.on <- metrics.on |> left_join(taxa.info)
 
 # ______________________________________________________________________________
 # 3. Plot function ----
+
+# colors
+cat1.colors <- c("darkgreen", "darkorange3", "brown",
+                 "green3", "lightgreen",
+                 "gray")
+
 # ______________________________________________________________________________
 
 plot_metric <- function (.metrics,
@@ -48,14 +63,15 @@ plot_metric <- function (.metrics,
   .metrics <- .metrics |> dplyr::select(final.taxon,
                                         all_of(.which),
                                         cat1,
-                                        cat2) |>
+                                        cat2,
+                                        func) |>
     
     rename(metric = .which)
   
   # correct x-axis title
   x.title <- case_when(.which == "pfoo" ~ "% frequency of occurrence",
                        .which == "poo" ~ "Proportion of occurrence",
-                       .which == "wpoo" ~ "Split-sample frequence of occurrence",
+                       .which == "wpoo" ~ "Split-sample frequency of occurrence",
                        .which == "rra" ~ "Relative read abundance")
   
   # plot
@@ -65,7 +81,7 @@ plot_metric <- function (.metrics,
     
     geom_col(aes(x = metric,
                  y = reorder(final.taxon, metric),
-                 fill = cat1),
+                 fill = func),
              linewidth = 0.2) +
     
     theme(panel.grid = element_blank(),
@@ -78,7 +94,7 @@ plot_metric <- function (.metrics,
           legend.title = element_blank(),
           plot.margin = margin(t = 5, r = -1.5, b = 5, l = 5)) +
     
-    scale_fill_viridis_d(option = "inferno") +
+    scale_fill_manual(values = cat1.colors) +
     
     scale_x_continuous(expand = c(0, 0)) +
     
