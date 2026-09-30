@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 16 Sep 2026
+# LAST MODIFIED: 30 Sep 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -12,6 +12,8 @@
 # ______________________________________________________________________________
 
 library(tidyverse)
+library(cowplot)
+library(mefa4)
 
 # ______________________________________________________________________________
 # 2. Read in data ----
@@ -46,6 +48,20 @@ taxa.info <- read.csv("data_cleaned/reads_taxa.csv") |>
 metrics.off <- metrics.off |> left_join(taxa.info)
 metrics.on <- metrics.on |> left_join(taxa.info)
 
+# scientific name set for labels
+nonscientific.set <- taxa.info$final.taxon[c(15, 16, 21, 43, 59, 68, 76, 96, 97)]
+scientific.set <- taxa.info$final.taxon[which(taxa.info$final.taxon %notin% nonscientific.set)]
+
+sci_labels <- function (x) {
+  
+  lapply(x , function (lab) {
+    
+    if (lab %in% scientific.set) bquote(italic(.(lab))) else lab
+    
+  })
+  
+}
+
 # ______________________________________________________________________________
 # 3. Plot function ----
 
@@ -57,7 +73,9 @@ cat1.colors <- c("darkgreen", "darkorange3", "brown",
 # ______________________________________________________________________________
 
 plot_metric <- function (.metrics,
-                         .which) {
+                         .which,
+                         .n.taxa = 35,
+                         .legend = T) {
   
   # keep correct column
   .metrics <- .metrics |> dplyr::select(final.taxon,
@@ -66,7 +84,10 @@ plot_metric <- function (.metrics,
                                         cat2,
                                         func) |>
     
-    rename(metric = .which)
+    rename(metric = .which) |>
+    
+    # keep only the first n
+    slice(1:.n.taxa)
   
   # correct x-axis title
   x.title <- case_when(.which == "pfoo" ~ "% frequency of occurrence",
@@ -75,7 +96,7 @@ plot_metric <- function (.metrics,
                        .which == "rra" ~ "Relative read abundance")
   
   # plot
-  ggplot(data = .metrics) +
+  out.plot <- ggplot(data = .metrics) +
     
     theme_classic() +
     
@@ -90,40 +111,52 @@ plot_metric <- function (.metrics,
                                      size = 8),
           axis.title.y = element_blank(),
           axis.title.x = element_text(size = 10),
-          legend.position = c(0.7, 0.4),
+          legend.position = c(0.7, 0.35),
           legend.title = element_blank(),
-          plot.margin = margin(t = 5, r = -1.5, b = 5, l = 5)) +
+          legend.text = element_text(size = 8,
+                                     vjust = 1),
+          legend.key.size = unit(0.35, "cm"),
+          plot.margin = margin(t = 1, r = 10, b = 1, l = 7)) +
     
     scale_fill_manual(values = cat1.colors) +
     
+    scale_y_discrete(labels = sci_labels) +
+    
     scale_x_continuous(expand = c(0, 0)) +
     
-    xlab(x.title)
+    xlab(x.title) 
+  
+  if (.legend == F) {
+    
+    out.plot <- out.plot + theme(legend.position = "none")
+    
+  }
+  
+  return(out.plot)
   
 }
 
 # ______________________________________________________________________________
 # 4. Plot ----
+
+# 620 x 480
+
 # ______________________________________________________________________________
 # 4a. Snow-off ----
-
-# 800 x 600
-
 # ______________________________________________________________________________
 
-plot_metric(metrics.off, "pfoo")
-plot_metric(metrics.off, "poo")
-plot_metric(metrics.off, "wpoo")
-plot_metric(metrics.off, "rra")
+plot_grid(plot_metric(metrics.off, "pfoo", 30, T),
+          plot_metric(metrics.off, "poo", 30, F),
+          plot_metric(metrics.off, "wpoo", 30, F),
+          plot_metric(metrics.off, "rra", 30, F),
+          nrow = 2)
 
 # ______________________________________________________________________________
 # 4b. Snow-off ----
-
-# 800 x 400
-
 # ______________________________________________________________________________
 
-plot_metric(metrics.on, "pfoo")
-plot_metric(metrics.on, "poo")
-plot_metric(metrics.on, "wpoo")
-plot_metric(metrics.on, "rra")
+plot_grid(plot_metric(metrics.on, "pfoo", 30, T),
+          plot_metric(metrics.on, "poo", 30, F),
+          plot_metric(metrics.on, "wpoo", 30, F),
+          plot_metric(metrics.on, "rra", 30, F),
+          nrow = 2)
