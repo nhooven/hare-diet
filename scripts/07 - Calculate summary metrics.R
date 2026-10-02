@@ -3,8 +3,8 @@
 # AUTHOR: Nate Hooven
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
-# COMPLETED: 
-# LAST MODIFIED: 15 Sep 2026
+# COMPLETED: 02 Oct 2026
+# LAST MODIFIED: 02 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -113,6 +113,8 @@ source("functions/calc_poo.R")
 source("functions/calc_wpoo.R")
 source("functions/calc_rra.R")
 
+source("functions/boot_metric.R")
+
 # ______________________________________________________________________________
 # 8. Wrapper function to calculate all ----
 # ______________________________________________________________________________
@@ -121,19 +123,31 @@ calc_metabar_metrics <- function (.reads) {
   
   suppressMessages({
     
-    foo <- calc_foo(.reads)
-    poo <- calc_poo(.reads)
-    wpoo <- calc_wpoo(.reads)
-    rra <- calc_rra(.reads)
+    foo <- boot_metric(.reads, .iter = 1000, "foo")
+    poo <- boot_metric(.reads, .iter = 1000, "poo")
+    wpoo <- boot_metric(.reads, .iter = 1000, "wpoo")
+    rra <- boot_metric(.reads, .iter = 1000, "rra")
     
-    # join
-    all.metrics <- foo |> dplyr::select(final.taxon, pfoo) |>
+    # join (create metric column too)
+    all.metrics <- foo |> dplyr::select(final.taxon, pfoo, se, lci, uci) |> 
       
-      left_join(poo |> dplyr::select(final.taxon, poo)) |>
+      rename(value = pfoo) |>
+      mutate(metric = "pfoo") |>
       
-      left_join(wpoo |> dplyr::select(final.taxon, wpoo)) |>
+      bind_rows(poo |> dplyr::select(final.taxon, poo, se, lci, uci) |> 
+                  
+                  rename(value = poo) |>
+                  mutate(metric = "poo")) |>
       
-      left_join(rra |> dplyr::select(final.taxon, rra))
+      bind_rows(wpoo |> dplyr::select(final.taxon, wpoo, se, lci, uci) |> 
+                  
+                  rename(value = wpoo) |>
+                  mutate(metric = "wpoo")) |>
+      
+      bind_rows(rra |> dplyr::select(final.taxon, rra, se, lci, uci) |> 
+                  
+                  rename(value = rra) |>
+                  mutate(metric = "rra"))
     
   })
   
@@ -152,20 +166,32 @@ metrics.on <- calc_metabar_metrics(reads.on)
 # function
 calc_ranks <- function(.metrics) {
   
-  taxa.ranks <- data.frame(
+  taxa.ranks <- .metrics |>
     
-    final.taxon = .metrics$final.taxon,
-    rank.pfoo = rank(1 / .metrics$pfoo),
-    rank.poo = rank(1 / .metrics$poo),
-    rank.wpoo = rank(1 / .metrics$wpoo),
-    rank.rra = rank(1 / .metrics$rra)
+    # ranks only need the value
+    dplyr::select(final.taxon, value, metric) |>
     
-  ) |>
+    # pivot
+    pivot_wider(names_from = "metric",
+                values_from = "value") |>
+    
+    # add ranks
+    mutate(
+      
+      rank.pfoo = rank(1 / pfoo),
+      rank.poo = rank(1 / poo),
+      rank.wpoo = rank(1 / wpoo),
+      rank.rra = rank(1 / rra)
+      
+    ) |>
     
     # arrange by mean rank
     mutate(mean.rank = (rank.pfoo + rank.poo + rank.wpoo + rank.rra) / 4) |>
     
-    arrange(mean.rank)
+    arrange(mean.rank) |>
+    
+    # keep only taxa and ranks
+    dplyr::select(final.taxon, rank.pfoo:rank.rra, mean.rank)
   
   return(taxa.ranks)
   
@@ -189,7 +215,3 @@ write.csv(metrics.on, "data_cleaned/summaries/metrics_on.csv", row.names = F)
 # ranks
 write.csv(ranks.off, "data_cleaned/summaries/ranks_off.csv", row.names = F)
 write.csv(ranks.on, "data_cleaned/summaries/ranks_on.csv", row.names = F)
-
-# NEXT:
-  # functional groups
-  # bootstrapping functions
