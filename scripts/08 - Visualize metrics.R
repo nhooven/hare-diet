@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 30 Sep 2026
+# LAST MODIFIED: 02 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -78,13 +78,17 @@ plot_metric <- function (.metrics,
                          .legend = T) {
   
   # keep correct column
-  .metrics <- .metrics |> dplyr::select(final.taxon,
-                                        all_of(.which),
-                                        cat1,
-                                        cat2,
-                                        func) |>
+  .metrics <- .metrics |> filter(metric == .which) |>
     
-    rename(metric = .which) |>
+    dplyr::select(final.taxon,
+                  value,
+                  lci,
+                  uci,
+                  cat1,
+                  cat2,
+                  func) |>
+    
+    mutate(metric = .which) |>
     
     # keep only the first n
     slice(1:.n.taxa)
@@ -100,17 +104,24 @@ plot_metric <- function (.metrics,
     
     theme_classic() +
     
-    geom_col(aes(x = metric,
-                 y = reorder(final.taxon, metric),
+    geom_col(aes(x = value,
+                 y = reorder(final.taxon, value),
                  fill = func),
              linewidth = 0.2) +
+    
+    geom_errorbar(aes(x = value,
+                      y = reorder(final.taxon, value),
+                      xmin = lci,
+                      xmax = uci),
+                  height = 0,
+                  color = "darkgray") +
     
     theme(panel.grid = element_blank(),
           axis.text.y = element_text(size = 5),
           axis.text.x = element_text(color = "black",
                                      size = 8),
           axis.title.y = element_blank(),
-          axis.title.x = element_text(size = 10),
+          axis.title.x = element_text(size = 9),
           legend.position = c(0.7, 0.35),
           legend.title = element_blank(),
           legend.text = element_text(size = 8,
@@ -152,7 +163,7 @@ plot_grid(plot_metric(metrics.off, "pfoo", 30, T),
           nrow = 2)
 
 # ______________________________________________________________________________
-# 4b. Snow-off ----
+# 4b. Snow-on ----
 # ______________________________________________________________________________
 
 plot_grid(plot_metric(metrics.on, "pfoo", 30, T),
