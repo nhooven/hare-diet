@@ -47,7 +47,10 @@ reads.1 <- reads.taxa |>
     samples.lookup.cut1 |> dplyr::select(Final.sample.ID, 
                                          Ear.tag, Treatment, Season, Sex, Site)
     
-  )
+  ) |>
+  
+  # keep only complete cases
+  drop_na(Ear.tag)
 
 # ______________________________________________________________________________
 # 5. Remove taxa <= 1% of reads in a given sample ----
