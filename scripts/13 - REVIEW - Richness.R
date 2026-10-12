@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 06 Oct 2026
 # COMPLETED: 07 Oct 2026
-# LAST MODIFIED: 07 Oct 2026
+# LAST MODIFIED: 12 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -12,6 +12,7 @@
 # ______________________________________________________________________________
 
 library(tidyverse)
+library(mefa4)
 library(iNEXT)
 
 # ______________________________________________________________________________
@@ -35,10 +36,9 @@ data.richness <- read.csv("data_review/data_richness.csv")
 
 # ______________________________________________________________________________
 
-# split by season
-reads.off <- reads.taxa |> filter(Season == "Off")
-reads.on <- reads.taxa |> filter(Season == "On")
-
+# split by season and remove unknown
+reads.off <- reads.taxa |> filter(Season == "Off" & final.taxon!= "unknown")
+reads.on <- reads.taxa |> filter(Season == "On" & final.taxon!= "unknown")
 
 # function to pivot into presence/absence data
 format_inext <- function (.reads) {
@@ -88,6 +88,14 @@ on.matrix <- format_inext(reads.on)
 # ______________________________________________________________________________
 
 data.richness.1 <- data.richness |>
+  
+  # remove unknowns
+  filter(Scientific %notin% c("unknown forbs",
+                              "unknown grass",
+                              "unknown graminoids",
+                              "unknown moss",
+                              "unknown lichen",
+                              "unknown shrubs")) |>
   
   group_by(Study) |>
   
@@ -209,5 +217,4 @@ ggplot(data = forPlot) +
 # 350 x 350
 
 # NEXT
-  # consider removing unknown taxa groups
   # split previous studies by season - worth being rigorous
