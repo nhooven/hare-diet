@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 06 Oct 2026
 # COMPLETED: 07 Oct 2026
-# LAST MODIFIED: 12 Oct 2026
+# LAST MODIFIED: 13 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -136,6 +136,10 @@ on.iNEXT <- iNEXT(
   conf = 0.95
   
 )
+
+# summaries for paper
+print(off.iNEXT)
+print(on.iNEXT)
 
 # prepare for plotting
 forPlot <- bind_rows(fortify(off.iNEXT), fortify(on.iNEXT)) |>
