@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 08 Sep 2026
 # COMPLETED: 08 Sep 2026
-# LAST MODIFIED: 15 Sep 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -16,6 +16,8 @@
 
 # we want to keep unidentified sequences in here, but ensure that bait/contaminants are
 # kicked out
+
+# additionally, we'll classify anything with < 95% identity match as "unknown"
 
 # ______________________________________________________________________________
 # 1. Load packages ----
@@ -113,7 +115,7 @@ asvs.all$genus[miss.fam]
 
 asvs.all$family[miss.fam] <- c("Ranunculaceae", "Grossulariaceae", 
                                "Salicaceae", "Cupressaceae",
-                               "Adoxaceae")
+                               "Cornaceae")
 
 # missing species
 # Aquilegia flavescens
@@ -146,6 +148,22 @@ asvs.all$genus[unk.Aster][1:4] <- c("Solidago / Symphyotrichum", "Hieracium / Ta
 asvs.all$sub.group[unk.Aster] <- c("Asteraceae 1", "Asteraceae 2",
                                    "Asteraceae 1", "Asteraceae 2",
                                    "unknown Asteraceae")
+
+# ______________________________________________________________________________
+# 5. Classify less certain ASVs as unknown ----
+# ______________________________________________________________________________
+
+asvs.all <- asvs.all |>
+  
+  mutate(family = ifelse(ident >= 95,
+                         family,
+                         "unknown"),
+         genus = ifelse(ident >= 95,
+                         genus,
+                         NA),
+         species = ifelse(ident >= 95,
+                         species,
+                         NA))
 
 # ______________________________________________________________________________
 # 5. Final taxon name and functional groups ----
@@ -274,7 +292,7 @@ asvs.all.1 <- asvs.all |>
       
       family %in% c("Poaceae", "Cyperaceae") ~ "graminoid",
       
-      genus %in% c("") | is.na(genus) == T ~ "unknown"
+      genus %in% c("", "unknown") | is.na(genus) == T ~ "unknown"
       
     )
     

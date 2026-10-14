@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 08 Oct 2026
 # COMPLETED: 08 Oct 2026
-# LAST MODIFIED: 08 Oct 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -32,8 +32,8 @@ reads <- read.csv("data_cleaned/reads_cleaned.csv")
 length(unique(reads$Final.sample.ID))   # apparently 178
 
 # per season
-nrow(samples.lookup |> filter(include.reasonable == "Y" & Season == "Off"))
-nrow(samples.lookup |> filter(include.reasonable == "Y" & Season == "On"))
+nrow(samples.lookup |> filter(include.reasonable == "Y" & Season == "Off")) # 94
+nrow(samples.lookup |> filter(include.reasonable == "Y" & Season == "On"))  # 84
 
 # ______________________________________________________________________________
 # 3. Reads ----
@@ -49,7 +49,7 @@ reads.all <- read.csv("data_cleaned/reads_all.csv")
 sum(reads.all$reads)   # total reads = 3,911,158
 
 # total reads after filtering
-sum(reads$reads)       # total reads = 3,005,528
+sum(reads$reads)       # total reads = 2,994,655
 
 # reads per sample (with contaminants after threshold)
 reads.per.sample.all <- reads.all |>
@@ -71,9 +71,9 @@ reads.per.sample <- reads |>
   summarize(reads = sum(reads)) |>
   ungroup()
   
-mean(reads.per.sample$reads)     # mean = 16884.99
-sd(reads.per.sample$reads)       # sd = 23901.93
-range(reads.per.sample$reads)    # range = 292 - 178248
+mean(reads.per.sample$reads)     # mean = 16823.9
+sd(reads.per.sample$reads)       # sd = 23861.9
+range(reads.per.sample$reads)    # range = 292 - 1782152
 
 # ______________________________________________________________________________
 # 4. ASVs ----
@@ -86,13 +86,13 @@ asvs <- read.csv("data_raw/asvs.csv")
 taxa <- read.csv("data_cleaned/all_taxa.csv")
 
 length(unique(paste0(asvs$ASV, asvs$batchID)))  # total ASVs = 385
-length(unique(taxa$ASV.unq))                    # retained ASVs = 333
+length(unique(taxa$ASV.unq))                  # retained ASVs = 333
 
 # total unknown ASVs
-nrow(taxa |> filter(final.taxon == "unknown"))  # total = 40
+nrow(taxa |> filter(final.taxon == "unknown"))  # total = 60
 
 # meaning that we assigned 333 - 40 to at least a family
-(333 - 40) / 333
+(333 - 60) / 333
 
 # ______________________________________________________________________________
 # 5. Diet items ----
@@ -125,13 +125,13 @@ items.sample.on <- reads.on |>
   ungroup()
 
 # off
-mean(items.sample.off$total.items)    # mean = 8.63
+mean(items.sample.off$total.items)    # mean = 8.585
 sd(items.sample.off$total.items)      # sd = 2.46
 range(items.sample.off$total.items)   # range = 4 - 15
 
 # on
 mean(items.sample.on$total.items)    # mean = 5.88
-sd(items.sample.on$total.items)      # sd = 2.27
+sd(items.sample.on$total.items)      # sd = 2.28
 range(items.sample.on$total.items)   # range = 2 - 18
 
 # total to each rank

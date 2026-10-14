@@ -4,8 +4,10 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 06 Oct 2026
 # COMPLETED: 07 Oct 2026
-# LAST MODIFIED: 13 Oct 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
+
+# QUESTION: does iNEXT allow a random seed? Might be worth it
 
 # ______________________________________________________________________________
 # 1. Load packages ----

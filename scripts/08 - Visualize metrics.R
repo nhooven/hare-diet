@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 02 Oct 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -49,7 +49,7 @@ metrics.off <- metrics.off |> left_join(taxa.info)
 metrics.on <- metrics.on |> left_join(taxa.info)
 
 # scientific name set for labels
-nonscientific.set <- taxa.info$final.taxon[c(15, 16, 21, 43, 59, 68, 76, 96, 97)]
+nonscientific.set <- taxa.info$final.taxon[c(15, 16, 21, 42, 59, 68, 76, 96)]
 scientific.set <- taxa.info$final.taxon[which(taxa.info$final.taxon %notin% nonscientific.set)]
 
 sci_labels <- function (x) {
@@ -94,7 +94,7 @@ plot_metric <- function (.metrics,
     slice(1:.n.taxa)
   
   # correct x-axis title
-  x.title <- case_when(.which == "pfoo" ~ "% frequency of occurrence",
+  x.title <- case_when(.which == "pfoo" ~ "Frequency of occurrence",
                        .which == "poo" ~ "Proportion of occurrence",
                        .which == "wpoo" ~ "Split-sample frequency of occurrence",
                        .which == "rra" ~ "Relative read abundance")
@@ -122,7 +122,7 @@ plot_metric <- function (.metrics,
                                      size = 8),
           axis.title.y = element_blank(),
           axis.title.x = element_text(size = 9),
-          legend.position = c(0.7, 0.35),
+          legend.position = c(0.7, 0.3),
           legend.title = element_blank(),
           legend.text = element_text(size = 8,
                                      vjust = 1),

@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 30 Sep 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -35,7 +35,7 @@ taxa.info <- read.csv("data_cleaned/reads_taxa.csv") |>
   ungroup()
 
 # scientific name set for labels
-nonscientific.set <- taxa.info$final.taxon[c(15, 16, 21, 43, 59, 68, 76, 96, 97)]
+nonscientific.set <- taxa.info$final.taxon[c(15, 16, 21, 42, 59, 68, 76, 96)]
 scientific.set <- taxa.info$final.taxon[which(taxa.info$final.taxon %notin% nonscientific.set)]
 
 sci_labels <- function (x) {
@@ -72,7 +72,7 @@ prep_for_plot <- function (.ranks) {
                                     "rank.poo",
                                     "rank.wpoo",
                                     "rank.rra"),
-                         labels = c("%FOO",
+                         labels = c("FOO",
                                     "POO",
                                     "SSFOO",
                                     "RRA")),
@@ -122,7 +122,7 @@ plot_ranks <- function(.df.for.plot,
                    color = func),
                fill = "white") +        # different color by functional group?
     
-    theme(axis.text.y = element_text(size = 5),
+    theme(axis.text.y = element_text(size = 6),
           axis.title.y = element_blank(),
           panel.grid.major.y = element_line(color = "gray95"),
           legend.position = c(0.8, 0.2),
@@ -131,6 +131,7 @@ plot_ranks <- function(.df.for.plot,
                                            color = "black"),
           legend.margin = margin(0.3, 4.5, 0.3, 0.5),
           legend.key.spacing.y = unit(-5, "pt"),
+          legend.key = element_rect(fill = NA),
           legend.text = element_text(size = 8,
                                      margin = margin(-0.5, 0.5, -0.5, 0.5)),
           axis.ticks.x = element_blank()) +
@@ -190,4 +191,5 @@ plot_ranks <- function(.df.for.plot,
 plot_grid(plot_ranks(ranks.off.for.plot, 30, "metric"),
           plot_ranks(ranks.on.for.plot, 30, "func"),
           labels = "auto",
-          nrow = 1)
+          nrow = 1,
+          rel_widths = c(1.0, 1.02))

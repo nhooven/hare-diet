@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 15 Sep 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -199,7 +199,7 @@ plot_rich <- function(.reads) {
 # 5c. Plot ----
 # ______________________________________________________________________________
 
-plot_rich(clean.reads.off.1)
+plot_rich(clean.reads.off.1)   # 724 x 320
 plot_rich(clean.reads.on.1)
 
 # ______________________________________________________________________________
@@ -307,7 +307,3 @@ plot_rra <- function(.reads) {
 
 plot_rra(reads.off.rra)
 plot_rra(reads.on.rra)
-
-# NEXT: 
-  # thinner lines?
-  # orde by collection date?

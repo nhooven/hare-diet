@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 09 Sep 2026
 # COMPLETED: 09 Sep 2026
-# LAST MODIFIED: 15 Sep 2026
+# LAST MODIFIED: 14 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -47,7 +47,7 @@ reads.taxa <- reads.all |>
   drop_na(final.taxon)
 
 # ______________________________________________________________________________
-# 4. Write ----
+# 5. Write ----
 # ______________________________________________________________________________
 
 write.csv(reads.taxa, "data_cleaned/reads_taxa.csv", row.names = F)
