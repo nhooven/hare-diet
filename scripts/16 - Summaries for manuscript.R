@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 08 Oct 2026
 # COMPLETED: 08 Oct 2026
-# LAST MODIFIED: 14 Oct 2026
+# LAST MODIFIED: 20 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -144,3 +144,22 @@ nrow(one.obs.per.taxon |> filter(genus != "" & is.na(genus) == F))  # 87 - 93.75
 
 # species
 nrow(one.obs.per.taxon |> filter(species != "" & is.na(species) == F))  # 56 - 58.3%
+
+# composition of functional groups
+reads.off |>
+  
+  group_by(final.taxon) |>
+  slice(1) |>
+  ungroup() |>
+  
+  group_by(cat1) |>
+  summarize(n())
+
+reads.on |>
+  
+  group_by(final.taxon) |>
+  slice(1) |>
+  ungroup() |>
+  
+  group_by(cat1) |>
+  summarize(n())
