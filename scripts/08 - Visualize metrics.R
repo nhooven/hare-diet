@@ -203,3 +203,202 @@ write.table(cor(metric.corr.off[ , 2:5], method = "spearman"),
 write.table(cor(metric.corr.on[ , 2:5], method = "spearman"), 
             "clipboard",
             sep = "\t")
+
+# ______________________________________________________________________________
+# 6. Functional group composition ----
+
+# here we'll show and summarize the implied composition by
+  # - POO
+  # - RRA
+
+# It doesn't make much sense to use FOO because samples will be multi-counted
+# BUT SSFOO sums to 1 so can't we use it?
+
+# richness would be the same as POO in this context
+
+# ______________________________________________________________________________
+# 6a. Snow-off ----
+# ______________________________________________________________________________
+
+# total items
+total.items.off <- length(unique(metrics.off$final.taxon))
+
+# clean
+df.for.plot.off <- bind_rows(
+  
+  # POO
+  metrics.off |>
+    
+    filter(metric == "poo") |>
+    
+    group_by(func) |>
+    summarize(comp = n() / total.items.off) |>
+    
+    mutate(metric = "poo"),
+  
+  # SSFOO
+  metrics.off |>
+    
+    filter(metric == "wpoo") |>
+    
+    group_by(func) |>
+    summarize(comp = sum(value)) |>
+    
+    mutate(metric = "ssfoo"),
+  
+  # RRA
+  metrics.off |>
+    
+    filter(metric == "rra") |>
+    
+    group_by(func) |>
+    summarize(comp = sum(value)) |>
+    
+    mutate(metric = "rra")
+  
+) |>
+  
+  # factor levels
+  mutate(metric = factor(metric,
+                         levels = c("poo", "ssfoo", "rra"),
+                         labels = c("POO",
+                                    "SSFOO",
+                                    "RRA")))
+
+# plot
+plot.comp.off <- ggplot(data = df.for.plot.off) +
+  
+  theme_classic() +
+  
+  geom_bar(aes(x = metric,
+               y = comp,
+               fill = func),
+           color = "white",
+           stat = "identity") +
+  
+  scale_fill_manual(values = cat1.colors) +
+  
+  coord_cartesian(expand = F) +
+  
+  theme(axis.text = element_text(color = "black"),
+        axis.text.x = element_text(angle = 360 - 45,
+                                   vjust = 1,
+                                   hjust = 0),
+        axis.title.x = element_blank(),
+        legend.title = element_blank()) +
+  
+  scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1.0),
+                     labels = c(0, 25, 50, 75, 100)) +
+  
+  ylab("Percent composition") +
+  ggtitle("a")
+
+plot.comp.off
+  
+# ______________________________________________________________________________
+# 6b. Snow-on ----
+# ______________________________________________________________________________
+
+# total items
+total.items.on <- length(unique(metrics.on$final.taxon))
+
+# clean
+df.for.plot.on <- bind_rows(
+  
+  # POO
+  metrics.on |>
+    
+    filter(metric == "poo") |>
+    
+    group_by(func) |>
+    summarize(comp = n() / total.items.on) |>
+    
+    mutate(metric = "poo"),
+  
+  # SSFOO
+  metrics.on |>
+    
+    filter(metric == "wpoo") |>
+    
+    group_by(func) |>
+    summarize(comp = sum(value)) |>
+    
+    mutate(metric = "ssfoo"),
+  
+  # RRA
+  metrics.on |>
+    
+    filter(metric == "rra") |>
+    
+    group_by(func) |>
+    summarize(comp = sum(value)) |>
+    
+    mutate(metric = "rra")
+  
+) |>
+  
+  # factor levels
+  mutate(metric = factor(metric,
+                         levels = c("poo", "ssfoo", "rra"),
+                         labels = c("POO",
+                                    "SSFOO",
+                                    "RRA")))
+
+# plot
+plot.comp.on <- ggplot(data = df.for.plot.on) +
+  
+  theme_classic() +
+  
+  geom_bar(aes(x = metric,
+               y = comp,
+               fill = func),
+           color = "white",
+           stat = "identity") +
+  
+  scale_fill_manual(values = cat1.colors) +
+  
+  coord_cartesian(expand = F) +
+  
+  theme(axis.text = element_text(color = "black"),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(angle = 360 - 45,
+                                   vjust = 1,
+                                   hjust = 0),
+        axis.title = element_blank(),
+        legend.position = "none") +
+  
+  scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1.0),
+                     labels = c(0, 25, 50, 75, 100),
+                     position = "right") +
+  
+  ylab("Percent composition") +
+  ggtitle("b")
+
+plot.comp.on
+
+# ______________________________________________________________________________
+# 6c. Plot together ----
+# ______________________________________________________________________________
+
+plot_grid(plot.comp.off, plot.comp.on,
+          rel_widths = c(1, 0.5))
+
+# 574 x 380
+
+# ______________________________________________________________________________
+# 6d. Summaries ----
+# ______________________________________________________________________________
+
+df.comp.summ.off <- df.for.plot.off |>
+  
+  pivot_wider(values_from = comp,
+              names_from = metric)
+
+write.table(df.comp.summ.off, "clipboard", sep = "\t")
+
+df.comp.summ.on <- df.for.plot.on |>
+  
+  pivot_wider(values_from = comp,
+              names_from = metric)
+
+write.table(df.comp.summ.on, "clipboard", sep = "\t")
