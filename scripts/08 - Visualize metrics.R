@@ -4,7 +4,7 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 15 Sep 2026
 # COMPLETED: 15 Sep 2026
-# LAST MODIFIED: 14 Oct 2026
+# LAST MODIFIED: 26 Oct 2026
 # R VERSION: 4.5.2
 
 # ______________________________________________________________________________
@@ -171,3 +171,35 @@ plot_grid(plot_metric(metrics.on, "pfoo", 30, T),
           plot_metric(metrics.on, "wpoo", 30, F),
           plot_metric(metrics.on, "rra", 30, F),
           nrow = 2)
+
+# ______________________________________________________________________________
+# 5. Pairwise correlation between metrics ----
+# ______________________________________________________________________________
+
+# clean
+metric.corr.off <- metrics.off |>
+  
+  dplyr::select(final.taxon,
+                value,
+                metric) |>
+  
+  pivot_wider(values_from = value,
+              names_from = metric)
+
+metric.corr.on <- metrics.on |>
+  
+  dplyr::select(final.taxon,
+                value,
+                metric) |>
+  
+  pivot_wider(values_from = value,
+              names_from = metric)
+
+# Spearman's correlation
+write.table(cor(metric.corr.off[ , 2:5], method = "spearman"), 
+            "clipboard",
+            sep = "\t")
+
+write.table(cor(metric.corr.on[ , 2:5], method = "spearman"), 
+            "clipboard",
+            sep = "\t")
