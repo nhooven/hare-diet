@@ -4,10 +4,8 @@
 # EMAIL: nathan.d.hooven@gmail.com
 # BEGAN: 06 Oct 2026
 # COMPLETED: 07 Oct 2026
-# LAST MODIFIED: 14 Oct 2026
+# LAST MODIFIED: 28 Oct 2026
 # R VERSION: 4.5.2
-
-# QUESTION: does iNEXT allow a random seed? Might be worth it
 
 # ______________________________________________________________________________
 # 1. Load packages ----
@@ -115,6 +113,8 @@ data.richness.1 <- data.richness |>
 # define sequence of sample sizes
 samp.seq <- 1:200
 
+set.seed(1234)
+
 # off
 off.iNEXT <- iNEXT(
   
@@ -126,6 +126,8 @@ off.iNEXT <- iNEXT(
   conf = 0.95
   
 )
+
+set.seed(1234)
 
 # on
 on.iNEXT <- iNEXT(
@@ -164,11 +166,11 @@ ggplot(data = forPlot) +
   theme_classic() +
   
   # min-max rect - snowshoe studies
-  geom_rect(xmin = 0,
-            xmax = 200,
-            ymin = data.richness.1$min,
-            ymax = data.richness.1$max,
-            fill = "gray90") +
+  #geom_rect(xmin = 0,
+  #          xmax = 200,
+  #          ymin = data.richness.1$min,
+  #          ymax = data.richness.1$max,
+  #          fill = "gray90") +
   
   geom_ribbon(aes(x = x,
                   y = y,
@@ -210,15 +212,15 @@ ggplot(data = forPlot) +
         legend.background = element_rect(fill = NA)) +
   
   # guides
-  guides(linetype = "none") +
+  guides(linetype = "none")
   
   # annotation
-  annotate(geom = "text",
-           x = 150,
-           y = 12,
-           size = 3,
-           color = "gray30",
-           label = "range from previous studies")
+  #annotate(geom = "text",
+  #         x = 150,
+  #         y = 12,
+  #         size = 3,
+  #         color = "gray30",
+  #         label = "range from previous studies")
 
 # 350 x 350
 
